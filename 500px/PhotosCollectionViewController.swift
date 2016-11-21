@@ -67,8 +67,8 @@ class PhotosCollectionViewController: UIViewController {
         }
     }
     
-    func onSearchError() {
         let alert = UIAlertController(title: "Failure", message: "Oops look like something went wrong", preferredStyle: .Alert)
+    private func onSearchError() {
         
         let tryAction = UIAlertAction(title: "Try again?", style: .Default) { alert in
             if let text = self.searchTextField.text where !text.isEmpty {
@@ -107,7 +107,7 @@ class PhotosCollectionViewController: UIViewController {
         }
     }
     
-    func loadMore() {
+    private func loadMore() {
         guard let searchTerm = searchTerm where !loading else {
             return
         }
