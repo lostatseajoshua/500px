@@ -67,10 +67,10 @@ class PhotosCollectionViewController: UIViewController {
         }
     }
     
-        let alert = UIAlertController(title: "Failure", message: "Oops look like something went wrong", preferredStyle: .Alert)
     private func onSearchError() {
+        let alert = UIAlertController(title: "Failure to search", message: "Oops look like something went wrong", preferredStyle: .Alert)
         
-        let tryAction = UIAlertAction(title: "Try again?", style: .Default) { alert in
+        let repeatSearchAction = UIAlertAction(title: "Try again", style: .Default) { alert in
             if let text = self.searchTextField.text where !text.isEmpty {
                 self.searchForPhotos(text)
             }
@@ -79,7 +79,7 @@ class PhotosCollectionViewController: UIViewController {
         let dismissAction = UIAlertAction(title: "Okay", style: .Default, handler: nil)
         
         alert.addAction(dismissAction)
-        alert.addAction(tryAction)
+        alert.addAction(repeatSearchAction)
         
         presentViewController(alert, animated: true, completion: nil)
     }
