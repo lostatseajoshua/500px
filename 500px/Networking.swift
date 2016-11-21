@@ -9,20 +9,20 @@
 import Foundation
 
 class Networking: NSObject {
-    let completion: NSData? -> Void
+    let completion: (NSError?, NSData?) -> Void
     private let data = NSMutableData()
     
     lazy private(set) var session: NSURLSession = {
         NSURLSession(configuration: .ephemeralSessionConfiguration(), delegate: self, delegateQueue: nil)
     }()
     
-    init(request: NSURLRequest, completion: NSData? -> Void) {
+    init(request: NSURLRequest, completion: (NSError?, NSData?) -> Void) {
         self.completion = completion
         super.init()
         session.dataTaskWithRequest(request).resume()
     }
     
-    init(url: NSURL, completion: NSData? -> Void) {
+    init(url: NSURL, completion: (NSError?, NSData?) -> Void) {
         self.completion = completion
         super.init()
         session.dataTaskWithURL(url).resume()
@@ -32,7 +32,7 @@ class Networking: NSObject {
 extension Networking: NSURLSessionDelegate {
     func URLSession(session: NSURLSession, didBecomeInvalidWithError error: NSError?) {
         if error != nil {
-            completion(nil)
+            completion(error, nil)
             return
         }
     }
@@ -48,9 +48,9 @@ extension Networking: NSURLSessionDataDelegate {
             session.finishTasksAndInvalidate()
         }
         if error != nil {
-            completion(nil)
+            completion(error, nil)
             return
         }
-        completion(data)
+        completion(nil, data)
     }
 }

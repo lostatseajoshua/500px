@@ -19,21 +19,26 @@ class ImageService {
      - Parameter search: A keyword to search photos on
      - Parameter completion: block to handle completion with optional array of `Photo`
      */
-    func getPhotos(search: String, page: Int, completion: [Photo]? -> Void) {
+    func getPhotos(search: String, page: Int, completion: (NSError?, [Photo]?) -> Void) {
         self.search = search
         
+        let failureError = NSError(domain: "Failure", code: 000, userInfo: nil)
         guard let request: NSURLRequest = .photos(search, pageNumber: page) else {
-            completion(nil)
+            completion(failureError, nil)
             return
         }
         
-        networking = Networking(request: request) { data in
+        networking = Networking(request: request) { error, data in
+            guard error == nil else {
+                completion(error, nil)
+                return
+            }
             guard let info = data?.toJSON() as? [NSObject: AnyObject] else {
-                completion(nil)
+                completion(failureError, nil)
                 return
             }
             guard let photosInfo = info[Parser.PhotoSearchAPIDefinition.Photos.apiKey] as? [[NSObject: AnyObject]] else {
-                completion(nil)
+                completion(failureError, nil)
                 return
             }
             
@@ -46,7 +51,7 @@ class ImageService {
                 }
             }
             
-            completion(photos)
+            completion(nil, photos)
         }
     }
 }

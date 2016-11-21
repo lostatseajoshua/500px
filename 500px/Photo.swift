@@ -61,12 +61,12 @@ class Photo: JSONDecodable {
         
         loading = true
         
-        networking = Networking(url: url) { data in
+        networking = Networking(url: url) { error, data in
             defer {
                 self.loading = false
                 self.networking = nil
             }
-            guard let data = data else {
+            guard let data = data where error == nil else {
                 completion(nil)
                 return
             }
