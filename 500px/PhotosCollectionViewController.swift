@@ -41,27 +41,47 @@ class PhotosCollectionViewController: UIViewController {
     }
     
     func searchForPhotos(term: String) {
-        if term != searchTerm {
-            toggleLoading(true)
-            loading = true
-            imageService.getPhotos(term, page: 1) {[weak self] photos in
-                defer {
-                    dispatch_async(dispatch_get_main_queue()) {
-                        self?.toggleLoading(false)
-                        self?.loading = false
-                    }
-                }
-                guard let photos = photos else {
-                    return
-                }
-                
-                self?.photos = photos
-                self?.searchTerm = term
+        toggleLoading(true)
+        loading = true
+        view.userInteractionEnabled = false
+        imageService.getPhotos(term, page: 1) {[weak self] error, photos in
+            defer {
                 dispatch_async(dispatch_get_main_queue()) {
-                    self?.collectionView.reloadData()
+                    self?.toggleLoading(false)
+                    self?.loading = false
+                    self?.view.userInteractionEnabled = true
                 }
             }
+            guard let photos = photos where error == nil else {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self?.onSearchError()
+                }
+                return
+            }
+            
+            self?.photos = photos
+            self?.searchTerm = term
+            dispatch_async(dispatch_get_main_queue()) {
+                self?.collectionView.reloadData()
+            }
         }
+    }
+    
+    private func onSearchError() {
+        let alert = UIAlertController(title: "Failure to search", message: "Oops look like something went wrong", preferredStyle: .Alert)
+        
+        let repeatSearchAction = UIAlertAction(title: "Try again", style: .Default) { alert in
+            if let text = self.searchTextField.text where !text.isEmpty {
+                self.searchForPhotos(text)
+            }
+        }
+        
+        let dismissAction = UIAlertAction(title: "Okay", style: .Default, handler: nil)
+        
+        alert.addAction(dismissAction)
+        alert.addAction(repeatSearchAction)
+        
+        presentViewController(alert, animated: true, completion: nil)
     }
     
     private func toggleLoading(flag: Bool) {
@@ -87,20 +107,21 @@ class PhotosCollectionViewController: UIViewController {
         }
     }
     
-    func loadMore() {
+    private func loadMore() {
         guard let searchTerm = searchTerm where !loading else {
             return
         }
         loading = true
         
-        imageService.getPhotos(searchTerm, page: currentPage + 1) {[weak self] photos in
+        imageService.getPhotos(searchTerm, page: currentPage + 1) {[weak self] error, photos in
             defer {
                 dispatch_async(dispatch_get_main_queue()) {
                     self?.toggleLoading(false)
                     self?.loading = false
                 }
             }
-            guard let photos = photos else {
+            
+            guard let photos = photos where error == nil else {
                 return
             }
             
