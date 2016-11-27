@@ -13,13 +13,13 @@ class PhotosCollectionViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     
     let imageService = ImageService()
-    private(set) var photos = [Photo]()
-    private var activityIndicator: UIActivityIndicatorView?
-    private var searchTerm: String?
-    private var currentPage = 0
-    private var loading = false
+    fileprivate(set) var photos = [Photo]()
+    fileprivate var activityIndicator: UIActivityIndicatorView?
+    fileprivate var searchTerm: String?
+    fileprivate var currentPage = 0
+    fileprivate var loading = false
     
-    private struct Identifiers {
+    fileprivate struct Identifiers {
         static let photoCollectionCellReuseId = "PhotoCollectionCellId"
         static let activityCollectionCellReuseId = "ActivityCollectionCellId"
         static let photoDetailsSegueId = "PhotoDetailSegueId"
@@ -40,20 +40,20 @@ class PhotosCollectionViewController: UIViewController {
         photos.removeAll()
     }
     
-    func searchForPhotos(term: String) {
+    func searchForPhotos(_ term: String) {
         toggleLoading(true)
         loading = true
-        view.userInteractionEnabled = false
+        view.isUserInteractionEnabled = false
         imageService.getPhotos(term, page: 1) {[weak self] error, photos in
             defer {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     self?.toggleLoading(false)
                     self?.loading = false
-                    self?.view.userInteractionEnabled = true
+                    self?.view.isUserInteractionEnabled = true
                 }
             }
-            guard let photos = photos where error == nil else {
-                dispatch_async(dispatch_get_main_queue()) {
+            guard let photos = photos, error == nil else {
+                DispatchQueue.main.async {
                     self?.onSearchError()
                 }
                 return
@@ -61,33 +61,33 @@ class PhotosCollectionViewController: UIViewController {
             
             self?.photos = photos
             self?.searchTerm = term
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 self?.collectionView.reloadData()
             }
         }
     }
     
-    private func onSearchError() {
-        let alert = UIAlertController(title: "Failure to search", message: "Oops look like something went wrong", preferredStyle: .Alert)
+    fileprivate func onSearchError() {
+        let alert = UIAlertController(title: "Failure to search", message: "Oops look like something went wrong", preferredStyle: .alert)
         
-        let repeatSearchAction = UIAlertAction(title: "Try again", style: .Default) { alert in
-            if let text = self.searchTextField.text where !text.isEmpty {
+        let repeatSearchAction = UIAlertAction(title: "Try again", style: .default) { alert in
+            if let text = self.searchTextField.text, !text.isEmpty {
                 self.searchForPhotos(text)
             }
         }
         
-        let dismissAction = UIAlertAction(title: "Okay", style: .Default, handler: nil)
+        let dismissAction = UIAlertAction(title: "Okay", style: .default, handler: nil)
         
         alert.addAction(dismissAction)
         alert.addAction(repeatSearchAction)
         
-        presentViewController(alert, animated: true, completion: nil)
+        present(alert, animated: true, completion: nil)
     }
     
-    private func toggleLoading(flag: Bool) {
+    fileprivate func toggleLoading(_ flag: Bool) {
         if flag && activityIndicator == nil {
             // create activity
-            let activity = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+            let activity = UIActivityIndicatorView(activityIndicatorStyle: .gray)
             activity.hidesWhenStopped = true
             activity.startAnimating()
             
@@ -96,8 +96,8 @@ class PhotosCollectionViewController: UIViewController {
             
             // add constraints
             activity.translatesAutoresizingMaskIntoConstraints = false
-            view.addConstraints([NSLayoutConstraint(item: activity, attribute: .CenterX, relatedBy: .Equal, toItem: view, attribute: .CenterX, multiplier: 1.0, constant: 0),
-                NSLayoutConstraint(item: activity, attribute: .CenterY, relatedBy: .Equal, toItem: view, attribute: .CenterY, multiplier: 1.0, constant: 0)])
+            view.addConstraints([NSLayoutConstraint(item: activity, attribute: .centerX, relatedBy: .equal, toItem: view, attribute: .centerX, multiplier: 1.0, constant: 0),
+                NSLayoutConstraint(item: activity, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 1.0, constant: 0)])
             
             self.activityIndicator = activity
         } else {
@@ -107,47 +107,47 @@ class PhotosCollectionViewController: UIViewController {
         }
     }
     
-    private func loadMore() {
-        guard let searchTerm = searchTerm where !loading else {
+    fileprivate func loadMore() {
+        guard let searchTerm = searchTerm, !loading else {
             return
         }
         loading = true
         
         imageService.getPhotos(searchTerm, page: currentPage + 1) {[weak self] error, photos in
             defer {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     self?.toggleLoading(false)
                     self?.loading = false
                 }
             }
             
-            guard let photos = photos where error == nil else {
+            guard let photos = photos, error == nil else {
                 return
             }
             
             if let strongSelf = self {
                 strongSelf.photos += photos
                 strongSelf.currentPage += 1
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     strongSelf.collectionView.reloadData()
                 }
             }
         }
     }
     
-    override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
+    override func didRotate(from fromInterfaceOrientation: UIInterfaceOrientation) {
         collectionView.performBatchUpdates(nil, completion: nil)
     }
     
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using [segue destinationViewController].
         // Pass the selected object to the new view controller.
         if segue.identifier == Identifiers.photoDetailsSegueId {
-            if let detailsVC = segue.destinationViewController as? PhotoDetailsViewController {
-                if let indexOfCell = collectionView.indexPathsForSelectedItems()?.first {
+            if let detailsVC = segue.destination as? PhotoDetailsViewController {
+                if let indexOfCell = collectionView.indexPathsForSelectedItems?.first {
                     detailsVC.photo = photos.element(atIndex: indexOfCell.row)
                 }
             }
@@ -158,8 +158,8 @@ class PhotosCollectionViewController: UIViewController {
 // MARK: UITextFieldDelegate
 
 extension PhotosCollectionViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        if let text = textField.text where !text.isEmpty {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if let text = textField.text, !text.isEmpty {
             searchForPhotos(text)
         }
         textField.resignFirstResponder()
@@ -171,25 +171,25 @@ extension PhotosCollectionViewController: UITextFieldDelegate {
 
 extension PhotosCollectionViewController: UICollectionViewDataSource {
     
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
 
 
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if !photos.isEmpty {
            return photos.count + 1
         }
         return 0
     }
 
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.row == photos.count {
             loadMore()
-            return collectionView.dequeueReusableCellWithReuseIdentifier(Identifiers.activityCollectionCellReuseId, forIndexPath: indexPath)
+            return collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.activityCollectionCellReuseId, for: indexPath)
         }
         
-        if let cell = collectionView.dequeueReusableCellWithReuseIdentifier(Identifiers.photoCollectionCellReuseId, forIndexPath: indexPath) as? PhotoCollectionViewCell {
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Identifiers.photoCollectionCellReuseId, for: indexPath) as? PhotoCollectionViewCell {
             if let photo = photos.element(atIndex: indexPath.row) {
                 cell.load(photo)
             }
@@ -204,17 +204,17 @@ extension PhotosCollectionViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegateFlowLayout
 
 extension PhotosCollectionViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var multipler: CGFloat = 2
         let spacing: CGFloat = 40
         
-        if UIDeviceOrientationIsLandscape(UIDevice.currentDevice().orientation) {
+        if UIDeviceOrientationIsLandscape(UIDevice.current.orientation) {
             multipler = 5
         }
         
         if indexPath.row == photos.count {
-            return CGSize(width: (UIScreen.mainScreen().bounds.width - spacing) / multipler, height: (UIScreen.mainScreen().bounds.width / multipler) - spacing)
+            return CGSize(width: (UIScreen.main.bounds.width - spacing) / multipler, height: (UIScreen.main.bounds.width / multipler) - spacing)
         }
-        return CGSize(width: (UIScreen.mainScreen().bounds.width - spacing) / multipler, height: (UIScreen.mainScreen().bounds.width / multipler))
+        return CGSize(width: (UIScreen.main.bounds.width - spacing) / multipler, height: (UIScreen.main.bounds.width / multipler))
     }
 }

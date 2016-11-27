@@ -8,14 +8,14 @@
 
 import Foundation
 
-extension CollectionType {
+extension Collection {
     /// Returns the element at the specified index if it is within the bounds of collection
     /// - Parameter index: `Index` of object to attempt to retrieve
     /// - Returns: `Element` of `Collection` if within bounds otherwise returns nil
-    func element(atIndex index: Index) -> Generator.Element? {
-        if indices.contains(index) {
-            return self[index]
-        }
+    func element(atIndex index: Index) -> Iterator.Element? {
+//        if indices.contains(where: index) {
+//            return self[index]
+//        }
         return nil
     }
 }

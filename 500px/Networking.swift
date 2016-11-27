@@ -9,48 +9,48 @@
 import Foundation
 
 class Networking: NSObject {
-    let completion: (NSError?, NSData?) -> Void
-    private let data = NSMutableData()
+    let completion: (NSError?, Data?) -> Void
+    fileprivate let data = NSMutableData()
     
-    lazy private(set) var session: NSURLSession = {
-        NSURLSession(configuration: .ephemeralSessionConfiguration(), delegate: self, delegateQueue: nil)
+    lazy fileprivate(set) var session: Foundation.URLSession = {
+        Foundation.URLSession(configuration: .ephemeral, delegate: self, delegateQueue: nil)
     }()
     
-    init(request: NSURLRequest, completion: (NSError?, NSData?) -> Void) {
+    init(request: URLRequest, completion: @escaping (NSError?, Data?) -> Void) {
         self.completion = completion
         super.init()
-        session.dataTaskWithRequest(request).resume()
+        session.dataTask(with: request).resume()
     }
     
-    init(url: NSURL, completion: (NSError?, NSData?) -> Void) {
+    init(url: URL, completion: @escaping (NSError?, Data?) -> Void) {
         self.completion = completion
         super.init()
-        session.dataTaskWithURL(url).resume()
+        session.dataTask(with: url).resume()
     }
 }
 
-extension Networking: NSURLSessionDelegate {
-    func URLSession(session: NSURLSession, didBecomeInvalidWithError error: NSError?) {
+extension Networking: URLSessionDelegate {
+    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         if error != nil {
-            completion(error, nil)
+            completion(error as NSError?, nil)
             return
         }
     }
 }
 
-extension Networking: NSURLSessionDataDelegate {
-    func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
-        self.data.appendData(data)
+extension Networking: URLSessionDataDelegate {
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        self.data.append(data)
     }
     
-    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         defer {
             session.finishTasksAndInvalidate()
         }
         if error != nil {
-            completion(error, nil)
+            completion(error as NSError?, nil)
             return
         }
-        completion(nil, data)
+        completion(nil, data as Data)
     }
 }

@@ -8,10 +8,10 @@
 
 import Foundation
 
-extension NSData {
-    func toJSON() -> AnyObject? {
+extension Data {
+    func toJSON() -> Any? {
         do {
-            return try NSJSONSerialization.JSONObjectWithData(self, options: .AllowFragments)
+            return try JSONSerialization.jsonObject(with: self, options: .allowFragments)
         } catch {
             print(error)
         }
@@ -20,7 +20,7 @@ extension NSData {
     }
     
     func jsonDescription() -> String? {
-        if let jsonDescription = NSString(data: self, encoding: NSUTF8StringEncoding) {
+        if let jsonDescription = NSString(data: self, encoding: String.Encoding.utf8.rawValue) {
             return jsonDescription as String
         }
         return nil

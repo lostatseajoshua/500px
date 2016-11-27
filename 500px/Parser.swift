@@ -13,7 +13,7 @@ struct Parser {
         case Photos
         
         var apiKey: String {
-            return self.rawValue.lowercaseString
+            return self.rawValue.lowercased()
         }
     }
     
@@ -26,7 +26,7 @@ struct Parser {
         case ImageURL = "image_url"
         
         var apiKey: String {
-            return self.rawValue.lowercaseString
+            return self.rawValue.lowercased()
         }
     }
 }
@@ -36,6 +36,6 @@ protocol APIKey {
 }
 
 protocol JSONDecodable {
-    init(json: [NSObject: AnyObject]) throws
+    init(json: [AnyHashable: Any]) throws
     var isValid: Bool { get }
 }

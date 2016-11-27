@@ -9,9 +9,9 @@
 import Foundation
 
 class ImageService {
-    private var search: String?
+    fileprivate var search: String?
     
-    private var networking: Networking?
+    fileprivate var networking: Networking?
     
     /**
      Get photos for search term
@@ -19,11 +19,11 @@ class ImageService {
      - Parameter search: A keyword to search photos on
      - Parameter completion: block to handle completion with optional array of `Photo`
      */
-    func getPhotos(search: String, page: Int, completion: (NSError?, [Photo]?) -> Void) {
+    func getPhotos(_ search: String, page: Int, completion: @escaping (NSError?, [Photo]?) -> Void) {
         self.search = search
         
         let failureError = NSError(domain: "Failure", code: 000, userInfo: nil)
-        guard let request: NSURLRequest = .photos(search, pageNumber: page) else {
+        guard let request: URLRequest = .photos(search, pageNumber: page) else {
             completion(failureError, nil)
             return
         }
@@ -33,11 +33,11 @@ class ImageService {
                 completion(error, nil)
                 return
             }
-            guard let info = data?.toJSON() as? [NSObject: AnyObject] else {
+            guard let info = data?.toJSON() as? [AnyHashable: Any] else {
                 completion(failureError, nil)
                 return
             }
-            guard let photosInfo = info[Parser.PhotoSearchAPIDefinition.Photos.apiKey] as? [[NSObject: AnyObject]] else {
+            guard let photosInfo = info[Parser.PhotoSearchAPIDefinition.Photos.apiKey] as? [[AnyHashable: Any]] else {
                 completion(failureError, nil)
                 return
             }

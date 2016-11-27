@@ -23,7 +23,7 @@ class PhotoDetailsViewController: UIViewController {
     
     func updateView() {
         photo?.getImage {[weak self] image in
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 self?.photoImageView.image = image
             }
         }

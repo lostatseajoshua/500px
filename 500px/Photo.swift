@@ -10,11 +10,11 @@ import Foundation
 import UIKit
 
 class Photo: JSONDecodable {
-    private var networking: Networking?
-    private var image: UIImage?
-    private var imageURL: String?
-    private var valid: Bool
-    private var loading = false
+    fileprivate var networking: Networking?
+    fileprivate var image: UIImage?
+    fileprivate var imageURL: String?
+    fileprivate var valid: Bool
+    fileprivate var loading = false
     
     var description: String
     var rating: Int
@@ -34,7 +34,7 @@ class Photo: JSONDecodable {
         id = 0
     }
     
-    required init(json: [NSObject: AnyObject]) {
+    required init(json: [AnyHashable: Any]) {
         imageURL = json.getValue(forKey: Parser.PhotoAPIDefinition.ImageURL.apiKey, defaultValue: "")
         description = json.getValue(forKey: Parser.PhotoAPIDefinition.Description.apiKey, defaultValue: "")
         rating = json.getValue(forKey: Parser.PhotoAPIDefinition.Rating.apiKey, defaultValue: 0)
@@ -43,7 +43,7 @@ class Photo: JSONDecodable {
         valid = !json.getValue(forKey: Parser.PhotoAPIDefinition.Nsfw.apiKey, defaultValue: false)
     }
     
-    func getImage(completion: UIImage? -> Void) {
+    func getImage(_ completion: @escaping (UIImage?) -> Void) {
         if let image = self.image {
             completion(image)
         } else {
@@ -53,8 +53,8 @@ class Photo: JSONDecodable {
         }
     }
     
-    private func getImageFromURL(url: String, completion: UIImage? -> Void) {
-        guard let url = NSURL(string: url) where !loading else {
+    fileprivate func getImageFromURL(_ url: String, completion: @escaping (UIImage?) -> Void) {
+        guard let url = URL(string: url), !loading else {
             completion(nil)
             return
         }
@@ -66,7 +66,7 @@ class Photo: JSONDecodable {
                 self.loading = false
                 self.networking = nil
             }
-            guard let data = data where error == nil else {
+            guard let data = data, error == nil else {
                 completion(nil)
                 return
             }

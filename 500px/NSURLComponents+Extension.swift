@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension NSURLComponents {
+extension URLComponents {
     enum Scheme: String {
         case SSL = "https"
         case NonSSL = "http"
@@ -29,8 +29,8 @@ extension NSURLComponents {
      - Parameter pageNumber: retrieve photos from a specific page. Page numbering is 1 indexed
      - Returns: `NSURLComponents` object composed of photo resources search URL
     */
-    static func api500pxPhotosSearchURLComponents(term: String, pageNumber: String) -> NSURLComponents {
-        let components = NSURLComponents()
+    static func api500pxPhotosSearchURLComponents(_ term: String, pageNumber: String) -> URLComponents {
+        var components = URLComponents()
         components.scheme = Scheme.SSL.rawValue
         components.host = API500pxIdentifiers.host
         components.path = API500pxIdentifiers.photosPath

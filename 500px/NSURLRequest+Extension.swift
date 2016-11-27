@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension NSURLRequest {
+extension URLRequest {
     enum HTTPMethod: String {
         case Get
         case Post
@@ -16,14 +16,14 @@ extension NSURLRequest {
         case Delete
     }
     
-    static func photos(search: String, pageNumber: Int) -> NSURLRequest? {
-        guard let url = NSURLComponents.api500pxPhotosSearchURLComponents(search, pageNumber: "\(pageNumber)").URL where pageNumber > 0 else {
+    static func photos(_ search: String, pageNumber: Int) -> URLRequest? {
+        guard let url = URLComponents.api500pxPhotosSearchURLComponents(search, pageNumber: "\(pageNumber)").url, pageNumber > 0 else {
             return nil
         }
         
-        let request = NSMutableURLRequest(URL: url)
-        request.HTTPMethod = HTTPMethod.Get.rawValue.uppercaseString
+        let request = NSMutableURLRequest(url: url)
+        request.httpMethod = HTTPMethod.Get.rawValue.uppercased()
         
-        return request
+        return request as URLRequest
     }
 }
