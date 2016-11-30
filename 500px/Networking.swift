@@ -10,7 +10,7 @@ import Foundation
 
 class Networking: NSObject {
     let completion: (NSError?, Data?) -> Void
-    fileprivate let data = NSMutableData()
+    fileprivate var data = Data()
     
     lazy fileprivate(set) var session: Foundation.URLSession = {
         Foundation.URLSession(configuration: .ephemeral, delegate: self, delegateQueue: nil)
@@ -51,6 +51,6 @@ extension Networking: URLSessionDataDelegate {
             completion(error as NSError?, nil)
             return
         }
-        completion(nil, data as Data)
+        completion(nil, data)
     }
 }

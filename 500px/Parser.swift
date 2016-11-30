@@ -36,6 +36,6 @@ protocol APIKey {
 }
 
 protocol JSONDecodable {
-    init(json: [AnyHashable: Any]) throws
+    init(json: [String: Any]) throws
     var isValid: Bool { get }
 }

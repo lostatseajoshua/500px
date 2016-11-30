@@ -22,7 +22,10 @@ class PhotoDetailsViewController: UIViewController {
     }
     
     func updateView() {
-        photo?.getImage {[weak self] image in
+        photoImageView.image = photo?.getImage {[weak self] image in
+            guard let image = image else {
+                return
+            }
             DispatchQueue.main.async {
                 self?.photoImageView.image = image
             }

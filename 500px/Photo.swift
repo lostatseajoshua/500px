@@ -34,7 +34,10 @@ class Photo: JSONDecodable {
         id = 0
     }
     
-    required init(json: [AnyHashable: Any]) {
+    required init(json: [String: Any]) {
+        if let imageURL = json[Parser.PhotoAPIDefinition.ImageURL.apiKey] as? String {
+            self.imageURL = imageURL
+        }
         imageURL = json.getValue(forKey: Parser.PhotoAPIDefinition.ImageURL.apiKey, defaultValue: "")
         description = json.getValue(forKey: Parser.PhotoAPIDefinition.Description.apiKey, defaultValue: "")
         rating = json.getValue(forKey: Parser.PhotoAPIDefinition.Rating.apiKey, defaultValue: 0)
@@ -43,14 +46,17 @@ class Photo: JSONDecodable {
         valid = !json.getValue(forKey: Parser.PhotoAPIDefinition.Nsfw.apiKey, defaultValue: false)
     }
     
-    func getImage(_ completion: @escaping (UIImage?) -> Void) {
+    func getImage(_ completion: @escaping (UIImage?) -> Void) -> UIImage? {
         if let image = self.image {
-            completion(image)
+            completion(nil)
+            return image
         } else {
             if let urlString = imageURL {
                 getImageFromURL(urlString, completion: completion)
             }
         }
+        
+        return nil
     }
     
     fileprivate func getImageFromURL(_ url: String, completion: @escaping (UIImage?) -> Void) {

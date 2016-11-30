@@ -33,11 +33,12 @@ class ImageService {
                 completion(error, nil)
                 return
             }
-            guard let info = data?.toJSON() as? [AnyHashable: Any] else {
+            
+            guard let info = data?.toJSON() as? [String: Any] else {
                 completion(failureError, nil)
                 return
             }
-            guard let photosInfo = info[Parser.PhotoSearchAPIDefinition.Photos.apiKey] as? [[AnyHashable: Any]] else {
+            guard let photosInfo = info[Parser.PhotoSearchAPIDefinition.Photos.apiKey] as? [[String: Any]] else {
                 completion(failureError, nil)
                 return
             }

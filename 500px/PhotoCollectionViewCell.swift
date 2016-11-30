@@ -25,7 +25,7 @@ class PhotoCollectionViewCell: UICollectionViewCell {
         photo = p
         
         toggleLoading(true)
-        photo?.getImage {[weak self] image in
+        imageView.image = photo?.getImage {[weak self] image in
             defer {
                 DispatchQueue.main.async {
                     self?.toggleLoading(false)

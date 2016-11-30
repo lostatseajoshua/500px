@@ -8,14 +8,11 @@
 
 import Foundation
 
-extension Collection {
+extension Collection where Indices.Iterator.Element == Index  {
     /// Returns the element at the specified index if it is within the bounds of collection
     /// - Parameter index: `Index` of object to attempt to retrieve
     /// - Returns: `Element` of `Collection` if within bounds otherwise returns nil
     func element(atIndex index: Index) -> Iterator.Element? {
-//        if indices.contains(where: index) {
-//            return self[index]
-//        }
-        return nil
+        return indices.contains(index) ? self[index] : nil
     }
 }
