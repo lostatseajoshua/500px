@@ -16,7 +16,7 @@ class PhotosCollectionViewController: UIViewController {
     private(set) var photos = [Photo]()
     private var activityIndicator: UIActivityIndicatorView?
     private var searchTerm: String?
-    private var currentPage = 0
+    private var currentPage = 1
     private var loading = false
     
     private struct Identifiers {
